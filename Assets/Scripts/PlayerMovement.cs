@@ -21,8 +21,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        mAnimator.SetFloat("Horizontal", mDirection.x);
-        mAnimator.SetFloat("Vertical", mDirection.y);
+        if (mDirection != Vector3.zero)
+        {
+            mAnimator.SetBool("IsMoving", true);
+            mAnimator.SetFloat("Horizontal", mDirection.x);
+            mAnimator.SetFloat("Vertical", mDirection.y);
+        }else
+        {
+            // Quieto
+            mAnimator.SetBool("IsMoving", false);
+        }
     }
 
     private void FixedUpdate()
