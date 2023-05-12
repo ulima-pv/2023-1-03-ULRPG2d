@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,11 +13,21 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D mRb;
     private Vector3 mDirection = Vector3.zero;
     private Animator mAnimator;
+    private PlayerInput mPlayerInput;
 
     private void Start()
     {
         mRb = GetComponent<Rigidbody2D>();
         mAnimator = GetComponent<Animator>();
+        mPlayerInput = GetComponent<PlayerInput>();
+
+        ConversationManager.Instance.OnConversationStop += OnConversationStopDelegate;
+        
+    }
+
+    private void OnConversationStopDelegate()
+    {
+        mPlayerInput.SwitchCurrentActionMap("Player");
     }
 
     private void Update()
@@ -43,5 +54,31 @@ public class PlayerMovement : MonoBehaviour
     public void OnMove(InputValue value)
     {
         mDirection = value.Get<Vector2>().normalized;
+    }
+
+    public void OnNext(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            ConversationManager.Instance.NextConversation();
+        }
+    }
+
+    public void OnCancel(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            ConversationManager.Instance.StopConversation();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        Conversation conversation;
+        if (other.transform.TryGetComponent<Conversation>(out conversation))
+        {
+            mPlayerInput.SwitchCurrentActionMap("Conversation");
+            ConversationManager.Instance.StartConversation(conversation);
+        }
     }
 }
