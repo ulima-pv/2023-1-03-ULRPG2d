@@ -14,12 +14,15 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 mDirection = Vector3.zero;
     private Animator mAnimator;
     private PlayerInput mPlayerInput;
+    private Transform hitBox;
 
     private void Start()
     {
         mRb = GetComponent<Rigidbody2D>();
         mAnimator = GetComponent<Animator>();
         mPlayerInput = GetComponent<PlayerInput>();
+
+        hitBox = transform.Find("HitBox");
 
         ConversationManager.Instance.OnConversationStop += OnConversationStopDelegate;
         
@@ -72,6 +75,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void OnAttack(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            mAnimator.SetTrigger("Attack");
+            hitBox.gameObject.SetActive(true);
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D other)
     {
         Conversation conversation;
@@ -80,5 +92,10 @@ public class PlayerMovement : MonoBehaviour
             mPlayerInput.SwitchCurrentActionMap("Conversation");
             ConversationManager.Instance.StartConversation(conversation);
         }
+    }
+
+    public void DisableHitBox()
+    {
+        hitBox.gameObject.SetActive(false);
     }
 }
