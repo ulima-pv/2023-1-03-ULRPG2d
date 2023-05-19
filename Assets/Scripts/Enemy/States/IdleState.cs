@@ -20,12 +20,27 @@ namespace Enemy
                     return new MovingState(mController);
                 }
             ));
+
+            Transitions.Add(new FSMTransition<EnemyController>(
+                isValid : () => {
+                    return Vector3.Distance(
+                        mController.transform.position,
+                        mController.Player.transform.position
+                    ) <= mController.AttackDistance;
+                },
+                getNextState : () => {
+                    return new AttackingState(mController);
+                }
+            ));
         }
 
         public override void OnEnter()
         {
             Debug.Log("OnEnter IdleState");
-            mController.spriteRenderer.color = Color.blue;
+            mController.animator.SetBool("IsMoving", false);
+            mController.animator.SetFloat("Horizontal", 0f);
+            mController.animator.SetFloat("Vertical", -1f);
+            mController.AttackingEnd = false;
         }
 
         public override void OnExit()
